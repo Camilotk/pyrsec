@@ -5,7 +5,7 @@ def str(s):
     def target(t_str):
         if (t_str.startswith(s)):
             return s
-        return Exception('Tried to parse but got')
+        return Exception(f'Tried to parse {s} but got {t_str[:10]}')
     return target
 
 def run(parser, target):
