@@ -1,5 +1,5 @@
 
-# str => s => target
+# str => s => parser_state => state
 def str(s):
     "Parses a string for match if it startswith a target string"
 
@@ -20,7 +20,10 @@ def str(s):
     
     return parser_state
 
+# sequence_of => parsers => parser_state => state
 def sequence_of(parsers):
+    "Recieves a list of parsers and parse each of them in a list"
+
     def parser_state(state):
         results = []
         next_state = state
@@ -30,6 +33,8 @@ def sequence_of(parsers):
             results.append(next_state["result"])
         
         return {
+            "target": next_state["target"],
+            "index": next_state["index"],
             "result": results
         }
     return parser_state
