@@ -21,26 +21,15 @@ def str(s):
 
         # if this parser is combined with other that pass a error it return the state and finish.
         if(is_error):
-            return {
-                "target": target_string, 
-                "index": index, 
-                "result": None, 
-                "is_error": True, 
-                "error": itemgetter('error')(state)
-            }
+            return update_error(state, itemgetter('error')(state))
 
-        #print( {"s": s, "target": target_string} )
+        # return if success 
         if (target_string[index:].startswith(s)):
             return update_state(state, index + len(s), s)
         
-        return {
-            "target": target_string,
-            "index": index,
-            "result": None,
-            "is_error": True,
-            "error": f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"'
-        }
-    
+        # return if error
+        return update_error(state, f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"')
+        
     return parser_state
 
 # sequence_of => parsers => parser_state => state
@@ -52,24 +41,13 @@ def sequence_of(parsers):
         next_state = state
 
         for p in parsers:
-            next_state = p(next_state)
             if next_state["is_error"]:
-                return {
-                    "target": next_state["target"],
-                    "index": next_state["index"],
-                    "result": None,
-                    "is_error": True,
-                    "error": next_state["error"]
-                }
+                return update_error(state, next_state["error"])
+
+            next_state = p(next_state)
             results.append(next_state["result"])
         
-        return {
-            "target": next_state["target"],
-            "index": next_state["index"],
-            "result": results,
-            "is_error": False,
-            "error": None
-        }
+        return update_state(state, next_state["index"], results) 
     return parser_state
 
 # run => (parser, target) => parser(target)
@@ -84,6 +62,6 @@ def run(parser, target):
     return parser(initial_state)
 
 if __name__ == '__main__':
-    # parser = sequence_of([str('hello there!'), str('goodbye there')])
-    parser = str('hello ')
+    parser = sequence_of([str('hello there!'), str('goodbye there')])
+    # parser = str('hello ')
     print(run(parser, 'hello there!goodbye there'))
