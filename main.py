@@ -20,8 +20,9 @@ def str(s):
         return {
             "target": target_string,
             "index": index,
-            "error": f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"',
-            "isError": True
+            "result": None,
+            "isError": True,
+            "error": f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"'
         }
     
     return parser_state
@@ -41,7 +42,9 @@ def sequence_of(parsers):
         return {
             "target": next_state["target"],
             "index": next_state["index"],
-            "result": results
+            "result": results,
+            "isError": False,
+            "error": None
         }
     return parser_state
 
