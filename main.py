@@ -5,12 +5,12 @@ def str(s):
     def parser_state(state):
         from operator import itemgetter
 
-        # if this parser is combined with other that pass a error it return the state and finish.
-        if(state["isError"]):
-            return state
+         #  destructuring dict is {target_string, index} = {target, index}
+        target_string, index, is_error = itemgetter('target', 'index', 'is_error')(state)
 
-        #  destructuring dict is {target_string, index} = {target, index}
-        target_string, index = itemgetter('target', 'index')(state)
+        # if this parser is combined with other that pass a error it return the state and finish.
+        if(is_error):
+            return state
 
         #print( {"s": s, "target": target_string} )
         if (target_string[index:].startswith(s)):
@@ -18,14 +18,15 @@ def str(s):
                 "target": target_string,
                 "index": index + len(s),
                 "result": s,
-                "error": None,
-                "isError": False
+                "is_error": False,
+                "error": None
+                
             }
         return {
             "target": target_string,
             "index": index,
             "result": None,
-            "isError": True,
+            "is_error": True,
             "error": f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"'
         }
     
@@ -47,7 +48,7 @@ def sequence_of(parsers):
             "target": next_state["target"],
             "index": next_state["index"],
             "result": results,
-            "isError": False,
+            "is_error": False,
             "error": None
         }
     return parser_state
@@ -58,7 +59,7 @@ def run(parser, target):
         "target": target,
         "index": 0,
         "result": None,
-        "isError": False,
+        "is_error": False,
         "error": None
     }
     return parser(initial_state)
