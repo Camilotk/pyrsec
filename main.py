@@ -10,7 +10,13 @@ def str(s):
 
         # if this parser is combined with other that pass a error it return the state and finish.
         if(is_error):
-            return state
+            return {
+                "target": target_string, 
+                "index": index, 
+                "result": None, 
+                "is_error": True, 
+                "error": itemgetter('error')(state)
+            }
 
         #print( {"s": s, "target": target_string} )
         if (target_string[index:].startswith(s)):
@@ -42,6 +48,14 @@ def sequence_of(parsers):
 
         for p in parsers:
             next_state = p(next_state)
+            if next_state["is_error"]:
+                return {
+                    "target": next_state["target"],
+                    "index": next_state["index"],
+                    "result": None,
+                    "is_error": True,
+                    "error": next_state["error"]
+                }
             results.append(next_state["result"])
         
         return {
@@ -65,6 +79,6 @@ def run(parser, target):
     return parser(initial_state)
 
 if __name__ == '__main__':
-    # parser = sequence_of([str('hello there!'), str('goodbye there')])
-    parser = str('azul ')
+    parser = sequence_of([str('hello there!'), str('goodbye there')])
+    # parser = str('azul ')
     print(run(parser, 'hello there!goodbye there'))
