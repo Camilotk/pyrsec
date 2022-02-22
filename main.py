@@ -14,6 +14,8 @@ def str(s):
                 "target": target_string,
                 "index": index + len(s),
                 "result": s,
+                "error": None,
+                "isError": False
             }
         return {
             "target": target_string,
@@ -48,7 +50,9 @@ def run(parser, target):
     initial_state = {
         "target": target,
         "index": 0,
-        "result": None
+        "result": None,
+        "isError": False,
+        "error": None
     }
     return parser(initial_state)
 
