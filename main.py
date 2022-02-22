@@ -5,6 +5,10 @@ def str(s):
     def parser_state(state):
         from operator import itemgetter
 
+        # if this parser is combined with other that pass a error it return the state and finish.
+        if(state["isError"]):
+            return state
+
         #  destructuring dict is {target_string, index} = {target, index}
         target_string, index = itemgetter('target', 'index')(state)
 
