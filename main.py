@@ -1,4 +1,3 @@
-
 # str => s => parser_state => state
 def str(s):
     "Parses a string for match if it startswith a target string"
@@ -16,7 +15,12 @@ def str(s):
                 "index": index + len(s),
                 "result": s,
             }
-        return Exception(f'Tried to parse {s} but got {target_string[index:index+10]}')
+        return {
+            "target": target_string,
+            "index": index,
+            "error": f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"',
+            "isError": True
+        }
     
     return parser_state
 
@@ -39,7 +43,7 @@ def sequence_of(parsers):
         }
     return parser_state
 
-
+# run => (parser, target) => parser(target)
 def run(parser, target):
     initial_state = {
         "target": target,
@@ -49,6 +53,6 @@ def run(parser, target):
     return parser(initial_state)
 
 if __name__ == '__main__':
-    parser = sequence_of([str('hello there!'), str('goodbye there')])
-    # parser = str('hello ')
+    # parser = sequence_of([str('hello there!'), str('goodbye there')])
+    parser = str('azul ')
     print(run(parser, 'hello there!goodbye there'))
