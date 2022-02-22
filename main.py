@@ -1,3 +1,14 @@
+def update_state(state, index, result):
+    # cannot return state directly because it returns the ref of obj state
+    # has to use as method to update instance and return the instance of state
+    state.update({"index": index, "result": result})
+    return state
+
+def update_error(state, error_msg):
+    # same as update_state
+    state.update({"is_error": True, "error": error_msg})
+    return state
+
 # str => s => parser_state => state
 def str(s):
     "Parses a string for match if it startswith a target string"
@@ -20,14 +31,8 @@ def str(s):
 
         #print( {"s": s, "target": target_string} )
         if (target_string[index:].startswith(s)):
-            return {
-                "target": target_string,
-                "index": index + len(s),
-                "result": s,
-                "is_error": False,
-                "error": None
-                
-            }
+            return update_state(state, index + len(s), s)
+        
         return {
             "target": target_string,
             "index": index,
@@ -79,6 +84,6 @@ def run(parser, target):
     return parser(initial_state)
 
 if __name__ == '__main__':
-    parser = sequence_of([str('hello there!'), str('goodbye there')])
-    # parser = str('azul ')
+    # parser = sequence_of([str('hello there!'), str('goodbye there')])
+    parser = str('hello ')
     print(run(parser, 'hello there!goodbye there'))
