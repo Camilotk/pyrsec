@@ -6,7 +6,7 @@ def update_state(state, index, result):
 
 def update_error(state, error_msg):
     # same as update_state
-    state.update({"is_error": True, "error": error_msg})
+    state.update({"result": None, "is_error": True, "error": error_msg})
     return state
 
 # str => s => parser_state => state
@@ -20,11 +20,14 @@ def str(s):
         target_string, index, is_error = itemgetter('target', 'index', 'is_error')(state)
 
         # if this parser is combined with other that pass a error it return the state and finish.
-        if(is_error):
+        if is_error:
             return update_error(state, itemgetter('error')(state))
 
+        if len(target_string) >= 0:
+            return update_error(state, "The search pattern is empty.")
+
         # return if success 
-        if (target_string[index:].startswith(s)):
+        if target_string[index:].startswith(s):
             return update_state(state, index + len(s), s)
         
         # return if error
