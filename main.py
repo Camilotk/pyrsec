@@ -10,8 +10,23 @@ def update_error(state, error_msg):
     return state
 
 class Parser:
+    "Represents the collection of the methods and states of the parsing"
     def __init__(self, parser_state_transformer):
-        pass
+        """
+        parser_state_transformer -> A parser function
+        """
+        self.parser_state_transformer = parser_state_transformer
+    
+    # Parser.run => (parser_state_transformer, target_string) => parser_state_transformer(target_string)
+    def run(self, target_string):
+        initial_state = {
+            "target": target_string,
+            "index": 0,
+            "result": None,
+            "is_error": False,
+            "error": None
+        }
+        return self.parser_state_transformer(initial_state)
 
 # str => s => parser_state => state
 def str(s):
@@ -27,7 +42,7 @@ def str(s):
         if is_error:
             return update_error(state, itemgetter('error')(state))
 
-        if len(target_string) >= 0:
+        if len(target_string) <= 0:
             return update_error(state, "The search pattern is empty.")
 
         # return if success 
@@ -55,20 +70,10 @@ def sequence_of(parsers):
             results.append(next_state["result"])
         
         return update_state(state, next_state["index"], results) 
-    return parser_state
-
-# run => (parser, target) => parser(target)
-def run(parser, target):
-    initial_state = {
-        "target": target,
-        "index": 0,
-        "result": None,
-        "is_error": False,
-        "error": None
-    }
-    return parser(initial_state)
+    return parser_state    
 
 if __name__ == '__main__':
-    parser = sequence_of([str('hello there!'), str('goodbye there')])
-    # parser = str('hello ')
-    print(run(parser, 'hello there!goodbye there'))
+    # parser = sequence_of([str('hello there!'), str('goodbye there')])
+    p_str = str('hello ')
+    parser = Parser(p_str)
+    print(parser.run('hello there!goodbye there'))
