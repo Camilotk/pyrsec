@@ -9,6 +9,10 @@ def update_error(state, error_msg):
     state.update({"result": None, "is_error": True, "error": error_msg})
     return state
 
+class Parser:
+    def __init__(self, parser_state_transformer):
+        pass
+
 # str => s => parser_state => state
 def str(s):
     "Parses a string for match if it startswith a target string"
