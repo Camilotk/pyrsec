@@ -31,6 +31,10 @@ class Parser:
     def map(self, fun):
         def parser_state(state):
             next_state = self.parser_state_transformer(state)
+
+            if next_state["is_error"]:
+                return next_state
+
             return update_state(next_state, 0, fun(next_state['result']))
              
         return Parser(parser_state)
