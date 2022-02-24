@@ -52,7 +52,7 @@ def str(s):
         # return if error
         return update_error(state, f'Tried to parse \"{s}\", but got \"{target_string[index:index+10]}\"')
         
-    return parser_state
+    return Parser(parser_state)
 
 # sequence_of => parsers => parser_state => state
 def sequence_of(parsers):
@@ -65,15 +65,17 @@ def sequence_of(parsers):
         for p in parsers:
             if next_state["is_error"]:
                 return update_error(state, next_state["error"])
-
-            next_state = p(next_state)
+            
+            next_state = p.parser_state_transformer(next_state)
             results.append(next_state["result"])
         
-        return update_state(state, next_state["index"], results) 
-    return parser_state    
+        return update_state(state, next_state["index"], results)
+
+    return Parser(parser_state) 
 
 if __name__ == '__main__':
     # parser = sequence_of([str('hello there!'), str('goodbye there')])
-    p_str = str('hello ')
-    parser = Parser(p_str)
-    print(parser.run('hello there!goodbye there'))
+    # p_str = str('hello ')
+    # print(p_str.run('hello there!goodbye there'))
+    p_seq = sequence_of([str('hello there!'), str('goodbye there')])
+    print(p_seq.run('hello there!goodbye there'))
