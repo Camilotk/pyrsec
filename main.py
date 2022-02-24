@@ -27,6 +27,13 @@ class Parser:
             "error": None
         }
         return self.parser_state_transformer(initial_state)
+    
+    def map(self, fun):
+        def parser_state(state):
+            next_state = self.parser_state_transformer(state)
+            return update_state(next_state, 0, fun(next_state['result']))
+             
+        return Parser(parser_state)
 
 # str => s => parser_state => state
 def str(s):
@@ -74,8 +81,8 @@ def sequence_of(parsers):
     return Parser(parser_state) 
 
 if __name__ == '__main__':
-    # parser = sequence_of([str('hello there!'), str('goodbye there')])
-    # p_str = str('hello ')
-    # print(p_str.run('hello there!goodbye there'))
-    p_seq = sequence_of([str('hello there!'), str('goodbye there')])
-    print(p_seq.run('hello there!goodbye there'))
+    parser = sequence_of([str('hello there!'), str('goodbye there')])
+    p_str = str('hello ').map(lambda x: {"value": x.upper()})
+    print(p_str.run('hello there!goodbye there'))
+    # p_seq = sequence_of([str('hello there!'), str('goodbye there')])
+    # print(p_seq.run('hello there!goodbye there'))
