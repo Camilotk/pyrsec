@@ -1,3 +1,6 @@
+from unicodedata import digit
+
+
 def update_state(state, index, result):
     # cannot return state directly because it returns the ref of obj state
     # has to use as method to update instance and return the instance of state
@@ -93,6 +96,11 @@ def letters():
         if len(target_string) <= 0:
             return update_error(state, "The search pattern is empty.")
 
+          # return if success 
+        if any(char.isalpha() for char in target_string[index:]):
+            import re
+            extracted_letters = re.search(r'^[A-Za-z]+', target_string[index:]).group()
+            return update_state(state, len(extracted_letters), list(extracted_letters))
         # return if success 
         if target_string[index:].isalpha():
             return update_state(state, index, list(target_string))
@@ -120,8 +128,10 @@ def digits():
             return update_error(state, "The search pattern is empty.")
 
         # return if success 
-        if target_string[index:].isdigit():
-            return update_state(state, index, list(target_string))
+        if any(char.isdigit() for char in target_string[index:]):
+            import re
+            extracted_digits = re.search(r'\d+', target_string[index:]).group()
+            return update_state(state, len(extracted_digits), list(extracted_digits))
         
         # return if error
         return update_error(state, f'Got \"{target_string[index:index+10]}\" that contains characters that arent digits.')
@@ -133,14 +143,17 @@ def sequence_of(parsers):
     "Recieves a list of parsers and parse each of them in a list"
 
     def parser_state(state):
+        length = len(parsers)
         results = []
         next_state = state
 
-        for p in parsers:
+        for i in range(len(parsers)):
+            out = parsers[i]().parser_state_transformer(next_state)
+
             if next_state["is_error"]:
                 return update_error(state, next_state["error"])
-            
-            next_state = p.parser_state_transformer(next_state)
+
+            next_state = out
             results.append(next_state["result"])
         
         return update_state(state, next_state["index"], results)
@@ -148,14 +161,10 @@ def sequence_of(parsers):
     return Parser(parser_state) 
 
 if __name__ == '__main__':
-    # parser = sequence_of([str('hello there!'), str('goodbye there')])
-    # p_str = str('azul ').map(lambda x: {"value": x.upper()}).errorMap(lambda x: {"error": x})
-    # print(p_str.run('hello there!goodbye there'))
+    p_seq = sequence_of([
+        digits,
+        letters,
+        digits
+    ])
 
-    p_digit = digits()
-    print(p_digit.run('123'))
-
-    # p_seq = sequence_of([str('hello there!'), str('goodbye there')])
-    # print(p_seq.run('hello there!goodbye there'))
-
-    # TODO: digits E3 10:40
+    print(p_seq.run('34234asdfas223123'))
