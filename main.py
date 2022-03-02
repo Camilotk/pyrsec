@@ -79,7 +79,7 @@ def str(s):
 # letter => parser_state => state
 def letters():
     "Parses a string for match if it startswith a target string"
-    print('letter')
+
     def parser_state(state):
         from operator import itemgetter
 
@@ -110,7 +110,7 @@ def letters():
 # digits => parser_state => state
 def digits():
     "Parses a string for match if it startswith a target string"
-    print('digit')
+
     def parser_state(state):
         from operator import itemgetter
 
@@ -187,4 +187,4 @@ if __name__ == '__main__':
         str('hell')
     ])
 
-    print(p_seq.run('hello world! 123'))
+    print(p_seq.run('hello world!'))
