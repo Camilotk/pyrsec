@@ -1,6 +1,3 @@
-from unicodedata import digit
-
-
 def update_state(state, index, result):
     # cannot return state directly because it returns the ref of obj state
     # has to use as method to update instance and return the instance of state
@@ -82,7 +79,7 @@ def str(s):
 # letter => parser_state => state
 def letters():
     "Parses a string for match if it startswith a target string"
-
+    print('letter')
     def parser_state(state):
         from operator import itemgetter
 
@@ -113,7 +110,7 @@ def letters():
 # digits => parser_state => state
 def digits():
     "Parses a string for match if it startswith a target string"
-
+    print('digit')
     def parser_state(state):
         from operator import itemgetter
 
@@ -138,12 +135,34 @@ def digits():
         
     return Parser(parser_state)
 
+# choice => parsers => parser_state => state
+def choice(parsers):
+    "Recieves a list of parsers and parse each of them in a list"
+
+    def parser_state(state):
+     
+        results = []
+        next_state = state
+
+        for parser in parsers:
+            try:
+                next_state = parser().run(state["target"])
+            except:
+                next_state = parser.run(state["target"])
+            
+            if not next_state["is_error"]:
+               return update_state(state, next_state["index"], next_state["result"])
+        
+        return update_error(state, 'couldnt parse')
+
+
+    return Parser(parser_state) 
+
 # sequence_of => parsers => parser_state => state
 def sequence_of(parsers):
     "Recieves a list of parsers and parse each of them in a list"
 
     def parser_state(state):
-        length = len(parsers)
         results = []
         next_state = state
 
@@ -160,11 +179,14 @@ def sequence_of(parsers):
 
     return Parser(parser_state) 
 
+
+
 if __name__ == '__main__':
-    p_seq = sequence_of([
+    p_str = str('hell')
+
+    p_seq = choice([
         digits,
-        letters,
-        digits
+        str('hell')
     ])
 
-    print(p_seq.run('34234asdfas223123'))
+    print(p_seq.run('hello world! 123'))
