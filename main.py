@@ -102,6 +102,32 @@ def letters():
         
     return Parser(parser_state)
 
+# digits => parser_state => state
+def digits():
+    "Parses a string for match if it startswith a target string"
+
+    def parser_state(state):
+        from operator import itemgetter
+
+         #  destructuring dict is {target_string, index} = {target, index}
+        target_string, index, is_error = itemgetter('target', 'index', 'is_error')(state)
+
+        # if this parser is combined with other that pass a error it return the state and finish.
+        if is_error:
+            return update_error(state, itemgetter('error')(state))
+
+        if len(target_string) <= 0:
+            return update_error(state, "The search pattern is empty.")
+
+        # return if success 
+        if target_string[index:].isdigit():
+            return update_state(state, index, list(target_string))
+        
+        # return if error
+        return update_error(state, f'Got \"{target_string[index:index+10]}\" that contains characters that arent digits.')
+        
+    return Parser(parser_state)
+
 # sequence_of => parsers => parser_state => state
 def sequence_of(parsers):
     "Recieves a list of parsers and parse each of them in a list"
@@ -122,12 +148,14 @@ def sequence_of(parsers):
     return Parser(parser_state) 
 
 if __name__ == '__main__':
-    parser = sequence_of([str('hello there!'), str('goodbye there')])
-    p_str = str('azul ').map(lambda x: {"value": x.upper()}).errorMap(lambda x: {"error": x})
-    print(p_str.run('hello there!goodbye there'))
+    # parser = sequence_of([str('hello there!'), str('goodbye there')])
+    # p_str = str('azul ').map(lambda x: {"value": x.upper()}).errorMap(lambda x: {"error": x})
+    # print(p_str.run('hello there!goodbye there'))
 
-    p_letter = letters()
-    print(p_letter.run('hello'))
+    p_digit = digits()
+    print(p_digit.run('123'))
 
     # p_seq = sequence_of([str('hello there!'), str('goodbye there')])
     # print(p_seq.run('hello there!goodbye there'))
+
+    # TODO: digits E3 10:40
