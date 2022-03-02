@@ -135,6 +135,27 @@ def digits():
         
     return Parser(parser_state)
 
+# sequence_of => parsers => parser_state => state
+def sequence_of(parsers):
+    "Recieves a list of parsers and parse each of them in a list"
+
+    def parser_state(state):
+        results = []
+        next_state = state
+
+        for i in range(len(parsers)):
+            out = parsers[i]().parser_state_transformer(next_state)
+
+            if next_state["is_error"]:
+                return update_error(state, next_state["error"])
+
+            next_state = out
+            results.append(next_state["result"])
+        
+        return update_state(state, next_state["index"], results)
+
+    return Parser(parser_state) 
+
 # choice => parsers => parser_state => state
 def choice(parsers):
     "Recieves a list of parsers and parse each of them in a list"
@@ -157,29 +178,6 @@ def choice(parsers):
 
 
     return Parser(parser_state) 
-
-# sequence_of => parsers => parser_state => state
-def sequence_of(parsers):
-    "Recieves a list of parsers and parse each of them in a list"
-
-    def parser_state(state):
-        results = []
-        next_state = state
-
-        for i in range(len(parsers)):
-            out = parsers[i]().parser_state_transformer(next_state)
-
-            if next_state["is_error"]:
-                return update_error(state, next_state["error"])
-
-            next_state = out
-            results.append(next_state["result"])
-        
-        return update_state(state, next_state["index"], results)
-
-    return Parser(parser_state) 
-
-
 
 if __name__ == '__main__':
     p_str = str('hell')
